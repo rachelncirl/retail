@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Retail \u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[DRachel's Shoes - Retail application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rachelncirl/retail.git"
+  },
+  "keywords": [
+    "Shoes",
+    "Retail"
+  ],
+  "author": "Rachel Roche",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rachelncirl/retail/issues"
+  },
+  "homepage": "https://github.com/rachelncirl/retail#readme",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.13.1"
+  }
+}
