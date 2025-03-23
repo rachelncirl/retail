@@ -1,0 +1,63 @@
+syntax = "proto3";
+ 
+package shop;
+ 
+service ShoeShop{
+
+  //Unary Rpc
+  rpc GetPrice(ProductRequest) returns (ProductResponse);
+  rpc Purchase(PurchaseRequest) returns (PurchaseResponse);
+
+  //Server Rpc
+  rpc ListShoes(Empty) returns (stream ProductResponse);
+  rpc ViewCart(Empty) returns (stream ViewCartResponse);
+
+  //Client rpc
+  rpc ShoppingCart(stream ShoppingCartRequest) returns (ShoppingCartResponse);
+  
+  //Bidirectional
+  rpc Chat(stream ChatMessage) returns (stream ChatMessage);
+}
+ 
+ 
+message ProductRequest{
+  string brand = 1;
+}
+ 
+message ProductResponse{
+  string brand = 1;
+  uint32 price = 2;
+}
+
+message ViewCartResponse {
+  string brand = 1;
+  uint32 size = 2;
+  string color = 3;
+  uint32 quantity = 4;
+}
+
+message PurchaseRequest {
+  string cartId = 1;
+}
+
+message PurchaseResponse {
+  string message = 1;
+}
+ 
+message Empty{}
+ 
+message ShoppingCartRequest {
+  string brand = 1;
+  string color = 2;
+  string size = 3;
+  uint32 quantity = 4;
+}
+ 
+message ShoppingCartResponse {
+  string message = 1;
+}
+ 
+message ChatMessage{
+  string user = 1;
+  string message = 2;
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Chat </title>
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                margin: 0;
+                padding: 20px;
+                background-color: blanchedalmond;
+            }
+            #chat-container {
+                width: 400px;
+                margin: 0 auto;
+                padding: 10px;
+                background-color: aliceblue;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            #messages {
+                height: 300px;
+                overflow-y: scroll;
+                border-bottom: 1px solid;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            #message-input {
+                width: calc(100% - 20px);
+                padding: 10px;
+                font-size: 16px;
+                margin-top: 10px;
+            }
+            #send-button {
+                padding: 10px, 15px;
+                color: white;
+                border: none;
+                cursor: pointer;
+                background-color: aqua;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="chat-container">
+            <div id="messages"></div>
+            <input type="text" id="messages-input" placeholder="Type your message..."/>
+            <button id="send-button">Send</button>
+        </div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io();
+            var username = '';
+
+            var messages = document.getElementById('messages');
+            var input = document.getElementById('messages-input');
+            var sendButton = document.getElementById('send-button');
+
+            socket.on('set username', function(name) {
+                username = name;
+                console.log('Your username is : ', username);
+            });
+
+            socket.on('chat message', function(data) {
+                var messageElement = document.createElement('div');
+                messageElement.textContent= data.username + ': ' + data.msg;
+                messages.appendChild(messageElement);
+                messages.scrollTop = messages.scrollHeight;
+            });
+
+            sendButton.addEventListener('click', function() {
+                var message = input.value;
+                if (message.trim()) {
+                    socket.emit('chat message', message);
+                    input.value = '';
+                }
+            });
+        </script>
+    </body>
+</html>
