@@ -1,8 +1,22 @@
 const grpc = require('@grpc/grpc-js')
 const protoLoader = require('@grpc/proto-loader');
+const express = require('express');
+const socketIo = require('socket.io');
+const http = require('http');
+const path = require('path');
  
-const packageDefinition = protoLoader.loadSync('protos/shop.proto', {});
+const packageDefinition = protoLoader.loadSync('../protos/shop.proto', {});
 const shopProto = grpc.loadPackageDefinition(packageDefinition).shop;
+
+const app = express();
+const appServer = http.createServer(app);
+const io = socketIo(appServer);
+
+let userCount = 1;
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'purchase.html'));
+});
  
  
 const shoes = [

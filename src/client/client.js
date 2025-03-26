@@ -2,7 +2,7 @@ const grpc = require('@grpc/grpc-js')
 const protoLoader = require('@grpc/proto-loader');
 const readlineSync = require("readline-sync");
 
-const packageDefinition = protoLoader.loadSync('protos/shop.proto', {});
+const packageDefinition = protoLoader.loadSync('../protos/shop.proto', {});
 const shopProto = grpc.loadPackageDefinition(packageDefinition).shop;
 
 const client = new shopProto.ShoeShop('localhost:50051', grpc.credentials.createInsecure());

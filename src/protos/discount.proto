@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package discount;
+
+service DiscountService {
+    rpc applyDiscount(DiscountRequest) returns (DiscountResponse) {}
+}
+
+message DiscountRequest {
+    string code = 1;
+}
+
+message DiscountResponse {
+    string message = 1;
+}

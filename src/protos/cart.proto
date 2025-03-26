@@ -1,32 +1,18 @@
 syntax = "proto3";
  
-package shop;
+package cart;
  
-service ShoeShop{
+service CartService {
 
   //Unary Rpc
-  rpc GetPrice(ProductRequest) returns (ProductResponse);
   rpc Purchase(PurchaseRequest) returns (PurchaseResponse);
 
   //Server Rpc
-  rpc ListShoes(Empty) returns (stream ProductResponse);
   rpc ViewCart(Empty) returns (stream ViewCartResponse);
 
   //Client rpc
   rpc ShoppingCart(stream ShoppingCartRequest) returns (ShoppingCartResponse);
   
-  //Bidirectional
-  rpc Chat(stream ChatMessage) returns (stream ChatMessage);
-}
- 
- 
-message ProductRequest{
-  string brand = 1;
-}
- 
-message ProductResponse{
-  string brand = 1;
-  uint32 price = 2;
 }
 
 message ViewCartResponse {
@@ -55,9 +41,4 @@ message ShoppingCartRequest {
  
 message ShoppingCartResponse {
   string message = 1;
-}
- 
-message ChatMessage{
-  string user = 1;
-  string message = 2;
 }

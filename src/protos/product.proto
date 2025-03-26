@@ -1,0 +1,23 @@
+syntax = "proto3";
+ 
+package product;
+ 
+service ProductService {
+
+  //Unary Rpc
+  rpc GetPrice(ProductRequest) returns (ProductResponse);
+
+  //Server Rpc
+  rpc ListShoes(Empty) returns (stream ProductResponse);
+
+}
+ 
+message ProductRequest{
+  string brand = 1;
+}
+ 
+message ProductResponse{
+  string brand = 1;
+  uint32 price = 2;
+}
+
