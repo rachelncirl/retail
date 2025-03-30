@@ -7,14 +7,6 @@ const shopProto = grpc.loadPackageDefinition(packageDefinition).shop;
 
 const client = new shopProto.ShoeShop('localhost:50051', grpc.credentials.createInsecure());
 
-// Client-side JavaScript function
-function hello() {
-  alert("Hello from the client-side JavaScript!");
-}
-
-// Attach event listener to the button to call the function
-document.getElementById('sayHello').addEventListener('click', hello);
-
 // Unary
 function getPrice() {
   const brand = readlineSync.question("Enter mobile brand: ");

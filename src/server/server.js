@@ -21,11 +21,12 @@ app.get('/', (req, res) => {
 
 // Hard coded product list
 const shoes = [
-  { brand: "New Balance", price: 120},
-  { brand: "Dr Martens", price: 150},
-  { brand: "Adidas", price: 100},
-  { brand: "Converse", price: 110},
-  { brand: "Birkenstock", price: 90}
+  { id: "NB1", brand: "New Balance", price: 120, description: "530", image: "/images/newbalance.jpg"},
+  { id: "DR1", brand: "Dr Martens", price: 200, description: "1460 Pascal", image: "/images/drmartens.jpg"},
+  { id: "AD1", brand: "Adidas", price: 100, description: "VL Court 3.0", image: "/images/adidas.jpg"},
+  { id: "CV1", brand: "Converse", price: 75, description: "All Star Hi", image: "/images/converse.jpg"},
+  { id: "BK1", brand: "Birkenstock", price: 90, description: "Arizona", image: "/images/birkenstock.jpg"},
+  { id: "CR1", brand: "Crocs", price: 90, description: "Classic Clog", image: "/images/crocs.jpg"}
 ];
 
 // Shopping cart contents
