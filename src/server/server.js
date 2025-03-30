@@ -18,7 +18,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'purchase.html'));
 });
  
- 
+
+// Hard coded product list
 const shoes = [
   { brand: "New Balance", price: 120},
   { brand: "Dr Martens", price: 150},
@@ -30,7 +31,7 @@ const shoes = [
 // Shopping cart contents
 const cartItems = [];
  
-//Unary
+// Unary
 function GetPrice(call, callback){
   const shoe = shoes.find(s => s.brand === call.request.brand);
   if(shoe){
@@ -40,7 +41,7 @@ function GetPrice(call, callback){
   }
 }
  
-//server streaming
+// Server streaming
 function ListShoes(call){
   shoes.forEach(shoe => call.write(shoe));
   call.end();
@@ -62,22 +63,22 @@ function ShoppingCart(call, callback){
   })
 }
 
-//server streaming
+// Server streaming
 function ViewCart(call){
   cartItems.forEach(item => call.write(item));
   call.end();
 }
 
-//Unary
+// Unary
 function Purchase(call, callback){
   let purchasedItems = cartItems.length;
   cartItems.length = 0;
   callback(null, {message: `${purchasedItems} items purchased`});
 }
 
-//Bidirectional
+// Bidirectional
 function Chat(call) {
-  console.log("In Chat");
+  console.log("TODO");
   call.end();
 }
  
