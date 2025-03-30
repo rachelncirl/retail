@@ -63,7 +63,7 @@ app.get('/list', (req, res) => {
 
     call.on("end", () => {
         // Return the list of shoes as a JSON response
-        res.json(shoes); 
+        res.json(shoes);
     });
 
     call.on("error", (error) => {
@@ -72,15 +72,31 @@ app.get('/list', (req, res) => {
     });
 });
 
-// Define an endpoint that will trigger the gRPC client
+// Define an endpoint for adding shoes to cart
 app.get('/addToCart', (req, res) => {
-    const code = req.query.code;
-    console.log("Code entered");
+    const id = req.query.id;
+    const userId = req.query.userId;
 
-    // TODO
+    let cart = [];
 
-    // Response
-    res.send(`Discount code ${code} applied!`);
+    console.log("Product ID requested: " + id + " for User: " + userId);
+    const call = client.AddToCart({ id, userId });
+
+    call.on("data", (shoe) => {
+        cart.push({
+            brand: shoe.brand,
+            price: shoe.price
+        });
+    });
+
+    call.on("end", () => {
+        res.json(cart);
+    });
+
+    call.on("error", (error) => {
+        console.error(error);
+        res.status(500).send('Error occurred while adding to cart');
+    });
 });
 
 // Serve static files (HTML, JS, etc.)
@@ -95,7 +111,7 @@ app.listen(PORT, () => {
 
 // Shop CLient
 
-// Unary
+// Unary - Change to Discount Service 
 function getPrice() {
     const brand = readlineSync.question("Enter mobile brand: ");
     console.log(brand);
