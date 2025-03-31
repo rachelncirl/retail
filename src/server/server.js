@@ -71,6 +71,9 @@ function RemoveFromCart(call) {
       cart.splice(shoeIndex, 1);
       console.log(`Removed ${call.request.id} from ${userId}'s cart.`);
     }
+
+    // Return the contents of the cart after removing the shoe
+    userCarts.get(userId).forEach(shoe => call.write(shoe));
   }
   call.end();
 }

@@ -11,8 +11,8 @@ service ShoeShop{
   //Server Rpc
   rpc ListShoes(Empty) returns (stream ProductResponse);
   rpc GetCartContents(Empty) returns (stream ProductResponse);
-  rpc AddToCart(AddToCartRequest) returns (stream ProductResponse);
-  rpc RemoveFromCart(RemoveFromCartRequest) returns (stream ProductResponse);
+  rpc AddToCart(UpdateCartRequest) returns (stream ProductResponse);
+  rpc RemoveFromCart(UpdateCartRequest) returns (stream ProductResponse);
 
   //Client rpc
   rpc Purchase(stream PurchaseRequest) returns (PurchaseResponse);
@@ -26,13 +26,9 @@ message ProductRequest{
   string brand = 1;
 }
 
-message AddToCartRequest{
+message UpdateCartRequest{
   string id = 1;
   string userId = 2;
-}
-
-message RemoveFromCartRequest{
-  string id = 1;
 }
  
 message ProductResponse{
@@ -48,7 +44,6 @@ message PurchaseRequest {
   string brand = 2;
   uint32 price = 3;
   string description = 4;
-  string image = 5;
 }
 
 message PurchaseResponse {

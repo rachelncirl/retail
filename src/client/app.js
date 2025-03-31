@@ -84,6 +84,35 @@ app.get('/addToCart', (req, res) => {
 
     call.on("data", (shoe) => {
         cart.push({
+            id: shoe.id,
+            brand: shoe.brand,
+            price: shoe.price
+        });
+    });
+
+    call.on("end", () => {
+        res.json(cart);
+    });
+
+    call.on("error", (error) => {
+        console.error(error);
+        res.status(500).send('Error occurred while adding to cart');
+    });
+});
+
+// Define an endpoint for removing shoes from the cart
+app.get('/removeFromCart', (req, res) => {
+    const id = req.query.id;
+    const userId = req.query.userId;
+
+    let cart = [];
+
+    console.log("Remove Product ID: " + id + " for User: " + userId);
+    const call = client.RemoveFromCart({ id, userId });
+
+    call.on("data", (shoe) => {
+        cart.push({
+            id: shoe.id,
             brand: shoe.brand,
             price: shoe.price
         });
