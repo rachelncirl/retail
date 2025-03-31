@@ -15,3 +15,5 @@ document.getElementById('applyDiscount').addEventListener('click', () => {
       console.error('Error:', error);
     });
 });
+
+

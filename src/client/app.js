@@ -17,20 +17,6 @@ const greeter = new greeterProto.Greeter('localhost:50060', grpc.credentials.cre
 const app = express();
 
 // Define an endpoint that will trigger the gRPC client
-app.get('/greet', (req, res) => {
-    const name = req.query.name || 'World';
-
-    // Make a gRPC request to the Greeter service
-    greeter.SayHello({ name: name }, (error, response) => {
-        if (!error) {
-            res.send(response.message);  // Send the message to the browser
-        } else {
-            res.status(500).send('Error occurred in gRPC request');
-        }
-    });
-});
-
-// Define an endpoint that will trigger the gRPC client
 app.get('/discount', (req, res) => {
     const code = req.query.code;
     console.log("Code entered");
@@ -126,6 +112,54 @@ app.get('/removeFromCart', (req, res) => {
         console.error(error);
         res.status(500).send('Error occurred while adding to cart');
     });
+});
+
+// Define an endpoint for removing shoes from the cart
+app.get('/refreshCart', (req, res) => {
+    const id = req.query.id;
+    const userId = req.query.userId;
+
+    let cart = [];
+
+    console.log("Remove Product ID: " + id + " for User: " + userId);
+    const call = client.GetCartContents({ userId });
+
+    call.on("data", (shoe) => {
+        cart.push({
+            id: shoe.id,
+            brand: shoe.brand,
+            price: shoe.price
+        });
+    });
+
+    call.on("end", () => {
+        res.json(cart);
+    });
+
+    call.on("error", (error) => {
+        console.error(error);
+        res.status(500).send('Error occurred while refreshing cart');
+    });
+});
+
+// Define an endpoint for clearing the contents of the shopping cart
+app.get('/clearCart', (req, res) => {
+    const userId = req.query.userId;
+
+    client.EmptyCart({ userId }, (error, response) => {
+        if (error) {
+            console.error('Error:', error);
+            res.status(500).send({
+                message: 'An error occurred while emptying the cart',
+                details: error.details,
+            });
+        } else {
+            res.status(200).send({
+                message: response.message,
+            });
+        }
+    });
+
 });
 
 // Serve static files (HTML, JS, etc.)

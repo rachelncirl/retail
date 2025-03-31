@@ -78,6 +78,29 @@ function RemoveFromCart(call) {
   call.end();
 }
 
+// Server streaming - Get the contents of the user's shopping cart
+function GetCartContents(call) {
+  const userId = call.request.userId;
+  if (userCarts.has(userId)) {
+
+    // Return the contents of the cart after removing the shoe
+    userCarts.get(userId).forEach(shoe => call.write(shoe));
+  }
+  call.end();
+}
+
+// Unary - Get the price of a shoe by its brand
+function EmptyCart(call, callback) {
+  const userId = call.request.userId;
+  if (userCarts.has(userId)) {
+    userCarts.get(userId).splice(0, userCarts.get(userId).length);
+    callback(null, { message: "Shopping Cart Emptied"});
+  } else {
+    callback(null, { message: "Shopping Cart Not Found" });
+  }
+}
+
+
 // Client rpc - Handle the shopping cart for each user
 function ShoppingCart(call, callback) {
   const userId = call.request.userId;
@@ -134,7 +157,7 @@ function Chat(call) {
 // Create gRPC server and add services
 const server = new grpc.Server();
 server.addService(shopProto.ShoeShop.service, {
-  GetPrice, ListShoes, ShoppingCart, ViewCart, Purchase, Chat, AddToCart, RemoveFromCart
+  GetPrice, ListShoes, ShoppingCart, ViewCart, Purchase, Chat, AddToCart, RemoveFromCart, GetCartContents, EmptyCart
 });
 
 const PORT = '50051';

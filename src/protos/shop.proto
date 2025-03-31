@@ -6,13 +6,14 @@ service ShoeShop{
 
   //Unary Rpc
   rpc GetPrice(ProductRequest) returns (ProductResponse);
-  rpc Discount(DiscountRequest) returns (DiscountResponse);
+  rpc EmptyCart(CartRequest) returns (CartResponse);
 
   //Server Rpc
   rpc ListShoes(Empty) returns (stream ProductResponse);
-  rpc GetCartContents(Empty) returns (stream ProductResponse);
+  rpc GetCartContents(CartRequest) returns (stream ProductResponse);
   rpc AddToCart(UpdateCartRequest) returns (stream ProductResponse);
   rpc RemoveFromCart(UpdateCartRequest) returns (stream ProductResponse);
+  rpc Discount(DiscountRequest) returns (stream ProductResponse);
 
   //Client rpc
   rpc Purchase(stream PurchaseRequest) returns (PurchaseResponse);
@@ -21,6 +22,13 @@ service ShoeShop{
   rpc Chat(stream ChatMessage) returns (stream ChatMessage);
 }
  
+message CartRequest {
+  string userId = 1;
+}
+
+message CartResponse {
+  string message = 1;
+}
  
 message ProductRequest{
   string brand = 1;
@@ -70,6 +78,7 @@ message ChatMessage{
 
 message DiscountRequest {
   string code = 1;
+  string userId = 2;
 }
 
 message DiscountResponse {
