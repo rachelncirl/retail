@@ -17,7 +17,11 @@ message ProductRequest{
 }
  
 message ProductResponse{
-  string brand = 1;
-  uint32 price = 2;
+  string id = 1;
+  string brand = 2;
+  uint32 price = 3;
+  string description = 4;
+  string image = 5;
 }
-
+ 
+message Empty{}

@@ -1,15 +1,19 @@
 syntax = "proto3";
-
+ 
 package discount;
-
+ 
 service DiscountService {
-    rpc applyDiscount(DiscountRequest) returns (DiscountResponse) {}
+
+  //Unary Rpc
+  rpc GetDiscount(DiscountRequest) returns (DiscountResponse);
+
 }
 
 message DiscountRequest {
-    string code = 1;
+  string code = 1;
+  string userId = 2;
 }
 
 message DiscountResponse {
-    string amount = 1;
+  uint32 percentage = 1;
 }

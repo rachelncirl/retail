@@ -4,10 +4,30 @@ const protoLoader = require('@grpc/proto-loader');
 const bodyParser = require('body-parser');
 
 // Load the proto files
-const shop = protoLoader.loadSync('../protos/shop.proto', {});
-const shopProto = grpc.loadPackageDefinition(shop).shop;
+const product = protoLoader.loadSync('../protos/product.proto', {});
+const productProto = grpc.loadPackageDefinition(product).product;
 
-const client = new shopProto.ShoeShop('localhost:50051', grpc.credentials.createInsecure());
+const cart = protoLoader.loadSync('../protos/cart.proto', {});
+const cartProto = grpc.loadPackageDefinition(cart).cart;
+
+const discount = protoLoader.loadSync('../protos/discount.proto', {});
+const discountProto = grpc.loadPackageDefinition(discount).discount;
+
+const purchase = protoLoader.loadSync('../protos/purchase.proto', {});
+const purchaseProto = grpc.loadPackageDefinition(purchase).purchase;
+
+const discovery = protoLoader.loadSync('../protos/discovery.proto', {});
+const discoveryProto = grpc.loadPackageDefinition(discovery).discovery;
+
+const chat = protoLoader.loadSync('../protos/chat.proto', {});
+const chatProto = grpc.loadPackageDefinition(chat).chat;
+
+const productClient = new productProto.ProductService('localhost:50051', grpc.credentials.createInsecure());
+const cartClient = new cartProto.CartService('localhost:50051', grpc.credentials.createInsecure());
+const discountClient = new discountProto.DiscountService('localhost:50051', grpc.credentials.createInsecure());
+const purchaseClient = new purchaseProto.PurchaseService('localhost:50051', grpc.credentials.createInsecure());
+const discoveryClient = new discoveryProto.DiscoveryService('localhost:50051', grpc.credentials.createInsecure());
+const chatClient = new chatProto.ChatService('localhost:50051', grpc.credentials.createInsecure());
 
 // Create an Express app
 const app = express();
@@ -20,7 +40,7 @@ app.post('/pay', (req, res) => {
     const paymentRequest = req.body
     console.log(paymentRequest);
 
-    client.Pay(paymentRequest, (error, response) => {
+    purchaseClient.Pay(paymentRequest, (error, response) => {
         if (error) {
             console.error('Error:', error);
             res.status(500).send({
@@ -46,7 +66,7 @@ app.get('/discount', (req, res) => {
     const id = req.query.id;
     const userId = req.query.userId;
 
-    client.GetDiscount({ userId }, (error, response) => {
+    discountClient.GetDiscount({ userId }, (error, response) => {
         if (error) {
             console.error('Error:', error);
             res.status(500).send({
@@ -62,13 +82,33 @@ app.get('/discount', (req, res) => {
     });
 });
 
+// Define an endpoint that will trigger the gRPC client
+app.get('/price', (req, res) => {
+    const brand = req.query.brand;
+
+    productClient.GetPrice({ brand }, (error, response) => {
+        if (error) {
+            console.error('Error:', error);
+            res.status(500).send({
+                message: 'An error occurred while getting the price',
+                details: error.details,
+            });
+        } else {
+            res.status(200).send({
+                brand: response.brand,
+                price: response.price
+            });
+        }
+    });
+});
+
 // Define an endpoint for listing shoes
 app.get('/list', (req, res) => {
 
     // Create an array for gathering the shoe list
     let shoes = [];
 
-    const call = client.ListShoes({});
+    const call = productClient.ListShoes({});
 
     call.on("data", (shoe) => {
 
@@ -101,7 +141,7 @@ app.get('/addToCart', (req, res) => {
     let cart = [];
 
     console.log("Product ID requested: " + id + " for User: " + userId);
-    const call = client.AddToCart({ id, userId });
+    const call = cartClient.AddToCart({ id, userId });
 
     call.on("data", (shoe) => {
         cart.push({
@@ -129,7 +169,7 @@ app.get('/removeFromCart', (req, res) => {
     let cart = [];
 
     console.log("Remove Product ID: " + id + " for User: " + userId);
-    const call = client.RemoveFromCart({ id, userId });
+    const call = cartClient.RemoveFromCart({ id, userId });
 
     call.on("data", (shoe) => {
         cart.push({
@@ -145,19 +185,18 @@ app.get('/removeFromCart', (req, res) => {
 
     call.on("error", (error) => {
         console.error(error);
-        res.status(500).send('Error occurred while adding to cart');
+        res.status(500).send('Error occurred while removing from the cart');
     });
 });
 
 // Define an endpoint for removing shoes from the cart
 app.get('/refreshCart', (req, res) => {
-    const id = req.query.id;
     const userId = req.query.userId;
 
     let cart = [];
 
-    console.log("Remove Product ID: " + id + " for User: " + userId);
-    const call = client.GetCartContents({ userId });
+    console.log("Refresh Cart for User: " + userId);
+    const call = cartClient.GetCartContents({ userId });
 
     call.on("data", (shoe) => {
         cart.push({
@@ -181,7 +220,7 @@ app.get('/refreshCart', (req, res) => {
 app.get('/clearCart', (req, res) => {
     const userId = req.query.userId;
 
-    client.EmptyCart({ userId }, (error, response) => {
+    cartClient.EmptyCart({ userId }, (error, response) => {
         if (error) {
             console.error('Error:', error);
             res.status(500).send({
@@ -194,7 +233,6 @@ app.get('/clearCart', (req, res) => {
             });
         }
     });
-
 });
 
 // Serve static files (HTML, JS, etc.)
@@ -207,77 +245,12 @@ app.listen(PORT, () => {
 });
 
 
-// Shop CLient
-
-// Unary - Change to Discount Service 
-function getPrice() {
-    const brand = readlineSync.question("Enter mobile brand: ");
-    console.log(brand);
-    client.GetPrice({ brand }, (error, response) => {
-        if (error) {
-            console.log(error);
-        }
-        else {
-            console.log(`brand: ${response.brand}, Price: ${response.price}`);
-        }
-    });
-}
-
-// Unary
-function purchase() {
-    let cartId = 1;
-    client.Purchase({ cartId }, (error, response) => {
-        if (error) {
-            console.log(error);
-        }
-        else {
-            console.log(`${response.message}`);
-        }
-    });
-}
-
-// Server rpc
-function listShoes() {
-    const call = client.ListShoes({});
-    call.on("data", (shop) => {
-        console.log(`brand: ${shop.brand}, Price: ${shop.price}`)
-    });
-    call.on("end", () => console.log("End of shoe list"));
-}
-
-// Client rpc
-function shoppingCart() {
-    const call = client.ShoppingCart((error, respomse) => {
-        if (error) console.error(error);
-        else console.log(respomse.message);
-    });
-
-    let moreItems = true;
-    while (moreItems) {
-        const brand = readlineSync.question("Enter Shoe brand: ");
-        const size = parseInt(readlineSync.question("Enter size: "));
-        const color = readlineSync.question("Enter color: ");
-        const quantity = parseInt(readlineSync.question("Enter quantity: "));
-        call.write({ brand, size, color, quantity });
-        moreItems = readlineSync.keyInYN("Add another item to the Shopping Cart?");
-    }
-
-    call.end();
-}
-
-// Server rpc
-function viewCartContents() {
-    const call = client.ViewCart({});
-    call.on("data", (cart) => {
-        console.log(`Brand: ${cart.brand}, Size: ${cart.size}, Color: ${cart.color}, Quantity: ${cart.quantity}`)
-    });
-    call.on("end", () => console.log("End of Cart Items list"));
-}
+// TODOS
 
 // Bidirectional
-function chat() {
+function chatPlaceholder() {
     console.log("Chatting");
-    const call = client.Chat({});
+    const call = shopClient.Chat({});
     call.on("data", (mobile) => {
         console.log(`brand: ${mobile.brand}, Price: ${mobile.price}`)
     });

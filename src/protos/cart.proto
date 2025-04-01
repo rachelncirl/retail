@@ -5,40 +5,32 @@ package cart;
 service CartService {
 
   //Unary Rpc
-  rpc Purchase(PurchaseRequest) returns (PurchaseResponse);
+  rpc EmptyCart(CartRequest) returns (CartResponse);
 
   //Server Rpc
-  rpc ViewCart(Empty) returns (stream ViewCartResponse);
+  rpc GetCartContents(CartRequest) returns (stream ProductResponse);
+  rpc AddToCart(UpdateCartRequest) returns (stream ProductResponse);
+  rpc RemoveFromCart(UpdateCartRequest) returns (stream ProductResponse);
 
-  //Client rpc
-  rpc ShoppingCart(stream ShoppingCartRequest) returns (ShoppingCartResponse);
-  
+}
+ 
+message CartRequest {
+  string userId = 1;
 }
 
-message ViewCartResponse {
-  string brand = 1;
-  uint32 size = 2;
-  string color = 3;
-  uint32 quantity = 4;
-}
-
-message PurchaseRequest {
-  string cartId = 1;
-}
-
-message PurchaseResponse {
+message CartResponse {
   string message = 1;
 }
- 
-message Empty{}
- 
-message ShoppingCartRequest {
-  string brand = 1;
-  string color = 2;
-  string size = 3;
-  uint32 quantity = 4;
+
+message UpdateCartRequest{
+  string id = 1;
+  string userId = 2;
 }
  
-message ShoppingCartResponse {
-  string message = 1;
+message ProductResponse{
+  string id = 1;
+  string brand = 2;
+  uint32 price = 3;
+  string description = 4;
+  string image = 5;
 }

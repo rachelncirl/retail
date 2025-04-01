@@ -3,10 +3,25 @@ const protoLoader = require('@grpc/proto-loader');
 const express = require('express');
 const socketIo = require('socket.io');
 const http = require('http');
-const path = require('path');
 
-const packageDefinition = protoLoader.loadSync('../protos/shop.proto', {});
-const shopProto = grpc.loadPackageDefinition(packageDefinition).shop;
+// Load the proto files
+const product = protoLoader.loadSync('../protos/product.proto', {});
+const productProto = grpc.loadPackageDefinition(product).product;
+
+const cart = protoLoader.loadSync('../protos/cart.proto', {});
+const cartProto = grpc.loadPackageDefinition(cart).cart;
+
+const discount = protoLoader.loadSync('../protos/discount.proto', {});
+const discountProto = grpc.loadPackageDefinition(discount).discount;
+
+const purchase = protoLoader.loadSync('../protos/purchase.proto', {});
+const purchaseProto = grpc.loadPackageDefinition(purchase).purchase;
+
+const discovery = protoLoader.loadSync('../protos/discovery.proto', {});
+const discoveryProto = grpc.loadPackageDefinition(discovery).discovery;
+
+const chat = protoLoader.loadSync('../protos/chat.proto', {});
+const chatProto = grpc.loadPackageDefinition(chat).chat;
 
 const app = express();
 const appServer = http.createServer(app);
@@ -26,7 +41,7 @@ const shoes = [
 const userCarts = new Map();
 
 // Hard code discount percentage for now
-const discount = 20;
+const discountPercentage = 20;
 
 // Unary - Get the price of a shoe by its brand
 function GetPrice(call, callback) {
@@ -43,7 +58,7 @@ function GetDiscount(call, callback) {
 
   //const shoe = shoes.find(s => s.brand === call.request.brand);
   //if (shoe) {
-    callback(null, { percentage: discount});
+    callback(null, { percentage: discountPercentage});
   //} else {
   //  callback(null, { percentage: 0 });
   //}
@@ -108,7 +123,7 @@ function GetCartContents(call) {
   call.end();
 }
 
-// Unary - Get the price of a shoe by its brand
+// Unary - Empty the customer's shopping cart
 function EmptyCart(call, callback) {
   const userId = call.request.userId;
   if (userCarts.has(userId)) {
@@ -121,7 +136,7 @@ function EmptyCart(call, callback) {
 
 
 // Client rpc - Handle the shopping cart for each user
-function ShoppingCart(call, callback) {
+function Order(call, callback) {
   const userId = call.request.userId;
   if (!userCarts.has(userId)) {
     userCarts.set(userId, []);
@@ -173,10 +188,36 @@ function Chat(call) {
   call.end();
 }
 
+// Bidirectional stream - Chat (not implemented)
+function Discover(call) {
+  console.log("TODO: Discovery");
+  call.end();
+}
+
 // Create gRPC server and add services
 const server = new grpc.Server();
-server.addService(shopProto.ShoeShop.service, {
-  GetPrice, ListShoes, ShoppingCart, ViewCart, Purchase, Pay, Chat, AddToCart, RemoveFromCart, GetCartContents, EmptyCart, GetDiscount
+server.addService(productProto.ProductService.service, {
+  GetPrice, ListShoes
+});
+
+server.addService(cartProto.CartService.service, {
+  AddToCart, RemoveFromCart, GetCartContents, EmptyCart
+});
+
+server.addService(discountProto.DiscountService.service, {
+  GetDiscount
+});
+
+server.addService(purchaseProto.PurchaseService.service, {
+  Pay, Order
+});
+
+server.addService(discoveryProto.DiscoveryService.service, {
+  Discover
+});
+
+server.addService(chatProto.ChatService.service, {
+  Chat
 });
 
 const PORT = '50051';

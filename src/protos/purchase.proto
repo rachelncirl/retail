@@ -1,0 +1,37 @@
+syntax = "proto3";
+ 
+package purchase;
+ 
+service PurchaseService {
+
+  //Unary Rpc
+  rpc Pay (PaymentRequest) returns (PaymentResponse);
+
+  //Client rpc
+  rpc Order(stream PurchaseRequest) returns (PurchaseResponse);
+  
+}
+
+message PurchaseRequest {
+  string id = 1;
+  string brand = 2;
+  uint32 price = 3;
+  string description = 4;
+}
+
+message PurchaseResponse {
+  string message = 1;
+}
+
+message PaymentRequest {
+  string cardName = 1;
+  string cardNumber = 2;
+  string exp = 3;
+  string cvv = 4;
+  uint32 amount = 5;
+}
+
+message PaymentResponse {
+  string message = 1;
+  bool success = 2;
+}

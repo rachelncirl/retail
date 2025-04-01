@@ -96,7 +96,7 @@ function refresh() {
 // Function to render the cart data
 function renderCartData(cartItems) {
     const cartContentsDiv = document.getElementById('cartContents');
-    cartContentsDiv.innerHTML = ''; // Clear previous contents
+    cartContentsDiv.innerHTML = ''; 
 
     const cartTable = document.createElement('table');
     cartTable.classList.add('table');
