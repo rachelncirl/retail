@@ -7,16 +7,18 @@ service ShoeShop{
   //Unary Rpc
   rpc GetPrice(ProductRequest) returns (ProductResponse);
   rpc EmptyCart(CartRequest) returns (CartResponse);
+  rpc GetDiscount(DiscountRequest) returns (DiscountResponse);
+  rpc Pay (PaymentRequest) returns (PaymentResponse);
 
   //Server Rpc
   rpc ListShoes(Empty) returns (stream ProductResponse);
   rpc GetCartContents(CartRequest) returns (stream ProductResponse);
   rpc AddToCart(UpdateCartRequest) returns (stream ProductResponse);
   rpc RemoveFromCart(UpdateCartRequest) returns (stream ProductResponse);
-  rpc Discount(DiscountRequest) returns (stream ProductResponse);
 
   //Client rpc
   rpc Purchase(stream PurchaseRequest) returns (PurchaseResponse);
+  rpc Order(stream PurchaseRequest) returns (PurchaseResponse);
   
   //Bidirectional
   rpc Chat(stream ChatMessage) returns (stream ChatMessage);
@@ -82,5 +84,18 @@ message DiscountRequest {
 }
 
 message DiscountResponse {
+  uint32 percentage = 1;
+}
+
+message PaymentRequest {
+  string cardName = 1;
+  string cardNumber = 2;
+  string exp = 3;
+  string cvv = 4;
+  uint32 amount = 5;
+}
+
+message PaymentResponse {
   string message = 1;
+  bool success = 2;
 }

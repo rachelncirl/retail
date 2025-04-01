@@ -1,20 +1,41 @@
 const express = require('express');
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
-const path = require('path');
+const bodyParser = require('body-parser');
 
 // Load the proto files
-const greeting = protoLoader.loadSync(path.join(__dirname, '../protos/greeting.proto'), {});
-const greeterProto = grpc.loadPackageDefinition(greeting).greeter;
-
 const shop = protoLoader.loadSync('../protos/shop.proto', {});
 const shopProto = grpc.loadPackageDefinition(shop).shop;
 
 const client = new shopProto.ShoeShop('localhost:50051', grpc.credentials.createInsecure());
-const greeter = new greeterProto.Greeter('localhost:50060', grpc.credentials.createInsecure());
 
 // Create an Express app
 const app = express();
+
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
+
+// Define an endpoint that will trigger the gRPC client
+app.post('/pay', (req, res) => {
+    const paymentRequest = req.body
+    console.log(paymentRequest);
+
+    client.Pay(paymentRequest, (error, response) => {
+        if (error) {
+            console.error('Error:', error);
+            res.status(500).send({
+                message: 'An error occurred while emptying the cart',
+                details: error.details,
+            });
+        } else {
+            console.log('Payment Response: ' + response.message)
+            res.status(200).send({
+                message: response.message,
+                success: response.success
+            });
+        }
+    });
+});
 
 // Define an endpoint that will trigger the gRPC client
 app.get('/discount', (req, res) => {
@@ -22,9 +43,23 @@ app.get('/discount', (req, res) => {
     console.log("Code entered");
 
     // TODO
+    const id = req.query.id;
+    const userId = req.query.userId;
 
-    // Response
-    res.send(`Discount code ${code} applied!`);
+    client.GetDiscount({ userId }, (error, response) => {
+        if (error) {
+            console.error('Error:', error);
+            res.status(500).send({
+                message: 'An error occurred while emptying the cart',
+                details: error.details,
+            });
+        } else {
+            console.log('Discount Amount: ' + response.percentage)
+            res.status(200).send({
+                percentage: response.percentage,
+            });
+        }
+    });
 });
 
 // Define an endpoint for listing shoes

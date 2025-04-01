@@ -25,6 +25,9 @@ const shoes = [
 // Map to hold user carts: key is userId, value is an array of cart items
 const userCarts = new Map();
 
+// Hard code discount percentage for now
+const discount = 20;
+
 // Unary - Get the price of a shoe by its brand
 function GetPrice(call, callback) {
   const shoe = shoes.find(s => s.brand === call.request.brand);
@@ -33,6 +36,22 @@ function GetPrice(call, callback) {
   } else {
     callback(null, { brand: "", price: 0 });
   }
+}
+
+// Unary - Get the price of a shoe by its brand
+function GetDiscount(call, callback) {
+
+  //const shoe = shoes.find(s => s.brand === call.request.brand);
+  //if (shoe) {
+    callback(null, { percentage: discount});
+  //} else {
+  //  callback(null, { percentage: 0 });
+  //}
+}
+
+// Unary - Pay
+function Pay(call, callback) {
+    callback(null, { message: "Payment Successful", success: true});
 }
 
 // Server streaming - List all available shoes
@@ -157,7 +176,7 @@ function Chat(call) {
 // Create gRPC server and add services
 const server = new grpc.Server();
 server.addService(shopProto.ShoeShop.service, {
-  GetPrice, ListShoes, ShoppingCart, ViewCart, Purchase, Chat, AddToCart, RemoveFromCart, GetCartContents, EmptyCart
+  GetPrice, ListShoes, ShoppingCart, ViewCart, Purchase, Pay, Chat, AddToCart, RemoveFromCart, GetCartContents, EmptyCart, GetDiscount
 });
 
 const PORT = '50051';

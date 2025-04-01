@@ -11,5 +11,5 @@ message DiscountRequest {
 }
 
 message DiscountResponse {
-    string message = 1;
+    string amount = 1;
 }

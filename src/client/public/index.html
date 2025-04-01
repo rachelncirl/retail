@@ -87,23 +87,23 @@
                 <form>
                     <div class="mb-3">
                         <label for="card-name" class="form-label">Name on Card</label>
-                        <input type="text" class="form-control" id="card-name" required>
+                        <input type="text" class="form-control" id="cardName" required>
                     </div>
                     <div class="mb-3">
                         <label for="card-number" class="form-label">Card Number</label>
-                        <input type="text" class="form-control" id="card-number" required>
+                        <input type="text" class="form-control" id="cardNumber" required>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="exp-date" class="form-label">Expiration Date</label>
-                            <input type="text" class="form-control" id="exp-date" placeholder="MM/YY" required>
+                            <input type="text" class="form-control" id="exp" placeholder="MM/YY" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="cvv" class="form-label">CVV</label>
                             <input type="text" class="form-control" id="cvv" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Complete Purchase</button>
+                    <button id="purchase" type="submit" class="btn btn-primary w-100">Complete Purchase</button>
                 </form>
 
                 <!-- Customer Support Chat -->
@@ -142,9 +142,10 @@
         </div>
     </div>
 
-    <script src="/js/client.js"></script>
     <script src="/js/products.js"></script>
     <script src="/js/cart.js"></script>
+    <script src="/js/purchase.js"></script>
+    <script src="/js/discount.js"></script>
     <script>
         function generateSessionId() {
             return Math.random().toString(36).substr(2, 9);  // Random 9-character alphanumeric string
