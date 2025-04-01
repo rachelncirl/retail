@@ -48,12 +48,11 @@ document.getElementById('purchase').addEventListener('click', function (event) {
                         // Successful payment
                         alert('Payment successful! Your purchase is complete.');
 
-                        // Make a unary API call to clear the cart
-                        fetch(`/clearCart?userId=${userId}`)
-                            .then(response => response.text())
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
+                        // Clear the Cart Contents after Purchase
+                        empty();
+
+                        // Reload the Cart after clearing
+                        refresh();
                     } else {
                         // Payment failed
                         alert('Payment failed: ' + data.message);
