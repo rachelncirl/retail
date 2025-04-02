@@ -35,7 +35,7 @@ const app = express();
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-// Define an endpoint that will trigger the gRPC client
+// Payment API call that will call the server to process the payment
 app.post('/pay', (req, res) => {
     const paymentRequest = req.body
     console.log(paymentRequest);
@@ -57,20 +57,36 @@ app.post('/pay', (req, res) => {
     });
 });
 
-// Define an endpoint that will trigger the gRPC client
+// Order API that will be called to place an order
+app.post('/order', (req, res) => {
+
+    const order = req.body
+
+    // Open the stream
+    const call = purchaseClient.Order((error, respomse) => {
+      if (error) console.error(error);
+      else console.log(respomse.message);
+    });
+  
+    // Write the items to the stream
+    for (let item of order) {
+        const { id, brand, price } = item; 
+        call.write({ id, brand, price });
+    }
+  
+    // Close the stream
+    call.end();
+});
+
+// Client Side API implementation to call the Discount Service
 app.get('/discount', (req, res) => {
     const code = req.query.code;
-    console.log("Code entered");
 
-    // TODO
-    const id = req.query.id;
-    const userId = req.query.userId;
-
-    discountClient.GetDiscount({ userId }, (error, response) => {
+    discountClient.GetDiscount({ code }, (error, response) => {
         if (error) {
             console.error('Error:', error);
             res.status(500).send({
-                message: 'An error occurred while emptying the cart',
+                message: 'An error occurred while applying the discount',
                 details: error.details,
             });
         } else {

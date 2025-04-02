@@ -11,7 +11,6 @@ const products = [
     {id: 2, name: "product 2", price: 200}
 ];
 
-
 const getProduct = (call, callback) => {
     const product = products.find(p => p.id === call.request.id);
     if (product) {

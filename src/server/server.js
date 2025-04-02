@@ -42,6 +42,7 @@ const userCarts = new Map();
 
 // Hard code discount percentage for now
 const discountPercentage = 20;
+const discountCode = "NEW20";
 
 // Unary - Get the price of a shoe by its brand
 function GetPrice(call, callback) {
@@ -53,18 +54,16 @@ function GetPrice(call, callback) {
   }
 }
 
-// Unary - Get the price of a shoe by its brand
+// Unary - Send back a percentage if the shopper enters a valid code
 function GetDiscount(call, callback) {
-
-  //const shoe = shoes.find(s => s.brand === call.request.brand);
-  //if (shoe) {
+  if (call.request.code == discountCode) {
     callback(null, { percentage: discountPercentage});
-  //} else {
-  //  callback(null, { percentage: 0 });
-  //}
+  } else {
+    callback(null, { percentage: 0 });
+  }
 }
 
-// Unary - Pay
+// Unary - Pay - Payment processing would be done here
 function Pay(call, callback) {
     callback(null, { message: "Payment Successful", success: true});
 }
@@ -135,51 +134,19 @@ function EmptyCart(call, callback) {
 }
 
 
-// Client rpc - Handle the shopping cart for each user
+// Client rpc - Handle the Order Request
 function Order(call, callback) {
-  const userId = call.request.userId;
-  if (!userCarts.has(userId)) {
-    userCarts.set(userId, []);
-  }
 
-  let totalItems = 0;
+  let userOrder = [];
 
-  call.on("data", (order) => {
-    totalItems += order.quantity;
-    const cart = userCarts.get(userId);
-    for (let i = 0; i < order.quantity; i++) {
-      const shoe = shoes.find(s => s.id === order.shoeId); // Assuming order contains shoeId and quantity
-      if (shoe) {
-        cart.push(shoe);
-      }
-    }
-    console.log(`${userId}'s cart has ${cart.length} items.`);
+  call.on("data", (orderItem) => {
+    userOrder.push(orderItem);
+    console.log(`Order has ${userOrder.length} items.`);
   });
 
   call.on("end", () => {
-    callback(null, { message: `${totalItems} items added to Cart` });
+    callback(null, { message: `Order has been placed for ${userOrder.length} items` });
   });
-}
-
-// Server streaming - View the user's cart
-function ViewCart(call) {
-  const userId = call.request.userId;
-  if (userCarts.has(userId)) {
-    userCarts.get(userId).forEach(item => call.write(item));
-  }
-  call.end();
-}
-
-// Unary - Handle the purchase of the cart items
-function Purchase(call, callback) {
-  const userId = call.request.userId;
-  if (userCarts.has(userId)) {
-    const purchasedItems = userCarts.get(userId).length;
-    userCarts.set(userId, []); // Clear the cart after purchase
-    callback(null, { message: `${purchasedItems} items purchased` });
-  } else {
-    callback(null, { message: "No items in the cart" });
-  }
 }
 
 // Bidirectional stream - Chat (not implemented)
