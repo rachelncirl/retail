@@ -23,9 +23,9 @@ const chat = protoLoader.loadSync('../protos/chat.proto', {});
 const chatProto = grpc.loadPackageDefinition(chat).chat;
 
 const productClient = new productProto.ProductService('localhost:50051', grpc.credentials.createInsecure());
-const cartClient = new cartProto.CartService('localhost:50051', grpc.credentials.createInsecure());
-const discountClient = new discountProto.DiscountService('localhost:50051', grpc.credentials.createInsecure());
-const purchaseClient = new purchaseProto.PurchaseService('localhost:50051', grpc.credentials.createInsecure());
+const cartClient = new cartProto.CartService('localhost:50052', grpc.credentials.createInsecure());
+const discountClient = new discountProto.DiscountService('localhost:50053', grpc.credentials.createInsecure());
+const purchaseClient = new purchaseProto.PurchaseService('localhost:50054', grpc.credentials.createInsecure());
 const discoveryClient = new discoveryProto.DiscoveryService('localhost:50051', grpc.credentials.createInsecure());
 const chatClient = new chatProto.ChatService('localhost:50051', grpc.credentials.createInsecure());
 
