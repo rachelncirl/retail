@@ -1,15 +1,15 @@
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
-const path = require('path');
 
-const PROTO_PATH = path.join(__dirname, '../proto/discovery.proto');
-const packageDefinition = protoLoader.loadSync(PROTO_PATH);
-const discoveryProto = grpc.loadPackageDefinition(packageDefinition).discovery;
+// Load the proto files
+const discovery = protoLoader.loadSync('../protos/discovery.proto', {});
+const discoveryProto = grpc.loadPackageDefinition(discovery).discovery;
 
 const services = {
     "productService": "localhost:50051",
-    "orderService":  "localhost:50052",
-    "chatService": "localhost:50053"
+    "cartService": "localhost:50052",
+    "discountService": "localhost:50053",
+    "purchaseService": "localhost:50054"
 };
 
 const discoverService = (call, callback) => {
@@ -17,7 +17,7 @@ const discoverService = (call, callback) => {
     const address = services[serviceName];
 
     if (address) {
-        callback(null, {address});
+        callback(null, { address });
     } else {
         callback({
             code: grpc.status.NOT_FOUND,
@@ -26,11 +26,31 @@ const discoverService = (call, callback) => {
     }
 };
 
+function Discover(call, callback) {
+    const serviceName = call.request.serviceName;
+    const address = services[serviceName];
+
+    if (address) {
+        callback(null, { address });
+    } else {
+        callback({
+            code: grpc.status.NOT_FOUND,
+            details: "service not found"
+        });
+    }
+}
+
+// Create gRPC server and add services
 const server = new grpc.Server();
 server.addService(discoveryProto.DiscoveryService.service, {
-    DiscoverService : discoverService
+    Discover
 });
-server.bindAsync('127.0.0.1:50050', grpc.ServerCredentials.createInsecure(), () => {
-    console.log('DiscoveryService is running');
-    server.start();
-})
+
+const PORT = '50050';
+server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), (error, port) => {
+    if (error) {
+        console.error(error);
+        return;
+    }
+    console.log(`Discovery Server running at localhost:${PORT}`);
+});
