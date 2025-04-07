@@ -90,7 +90,7 @@ function refreshCart(req, callback) {
 function clearCart(req, callback) {
     const userId = req.query.userId;
 
-    cartClient.EmptyCart({ userId }, (error, response) => {
+    cartClient.EmptyCart({ userId }, (error) => {
         if (error) {
             console.error('Error:', error);
             callback(error, 'Error occurred while clearing the cart');

@@ -1,13 +1,14 @@
 var grpc = require("@grpc/grpc-js")
 var protoLoader = require("@grpc/proto-loader")
-var PROTO_PATH = __dirname + "/protos/chat.proto"
-var packageDefinition = protoLoader.loadSync(PROTO_PATH);
-var chat_proto = grpc.loadPackageDefinition(packageDefinition).chat
+
+// Load the proto files
+const chat = protoLoader.loadSync('../protos/chat.proto', {});
+const chatProto = grpc.loadPackageDefinition(chat).chat;
 
 var clients = {
 }
 
-function sendMessage(call){
+function SendMessage(call){
   call.on('data', function(chat_message){
 
     if(!(chat_message.name in clients)){
@@ -35,16 +36,17 @@ function sendMessage(call){
   });
 }
 
-var server = new grpc.Server();
-server.addService(chat_proto.ChatService.service, {
-  sendMessage: sendMessage
+// Create gRPC server and add services
+const server = new grpc.Server();
+server.addService(chatProto.ChatService.service, {
+  SendMessage
 });
 
-
-server.bindAsync("0.0.0.0:40001", grpc.ServerCredentials.createInsecure(), function (error, port) {
+const PORT = '50055';
+server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), (error, port) => {
   if (error) {
-    console.error("Error starting server:", error);
+    console.error(error);
     return;
   }
-  console.log("Server started on port " + port);
+  console.log(`Chat Server running at localhost:${PORT}`);
 });

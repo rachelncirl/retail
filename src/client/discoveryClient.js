@@ -9,7 +9,7 @@ const discoveryClient = new discoveryProto.DiscoveryService('localhost:50050', g
 
 // Function to discover service information
 const discoverService = (serviceName, callback) => {
-    console.log("In DiscoveryClient JS File");
+
     discoveryClient.Discover ({
         serviceName: serviceName
     }, (err, response) => {

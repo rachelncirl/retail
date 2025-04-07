@@ -5,25 +5,13 @@ const protoLoader = require('@grpc/proto-loader');
 const discovery = protoLoader.loadSync('../protos/discovery.proto', {});
 const discoveryProto = grpc.loadPackageDefinition(discovery).discovery;
 
+// List of Discoverable Services
 const services = {
     "productService": "localhost:50051",
     "cartService": "localhost:50052",
     "discountService": "localhost:50053",
-    "purchaseService": "localhost:50054"
-};
-
-const discoverService = (call, callback) => {
-    const serviceName = call.request.serviceName;
-    const address = services[serviceName];
-
-    if (address) {
-        callback(null, { address });
-    } else {
-        callback({
-            code: grpc.status.NOT_FOUND,
-            details: "service not found"
-        });
-    }
+    "purchaseService": "localhost:50054",
+    "chatService": "localhost:50055"
 };
 
 function Discover(call, callback) {
