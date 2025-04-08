@@ -1,21 +1,40 @@
-const grpc = require('@grpc/grpc-js');
-const protoLoader = require('@grpc/proto-loader');
-const path = require('path');
+var grpc = require("@grpc/grpc-js")
+var protoLoader = require("@grpc/proto-loader")
 
-const PROTO_PATH = path.join(__dirname, '../proto/chat.proto');
-const packageDefinition = protoLoader.loadSync(PROTO_PATH);
-const chatProto = grpc.loadPackageDefinition(packageDefinition).chat;
+// Load the proto files
+const chat = protoLoader.loadSync('../protos/chat.proto', {});
+const chatProto = grpc.loadPackageDefinition(chat).chat;
 
-const sendMessage = (call, callback) => {
-    console.log(`Received Message from ${call.request.user}: ${call.request.message}`);
-    callback(null, {response: `Hello ${call.request.user}, your message was received: "${call.request.message}`});
+// Create a server
+const server = new grpc.Server();
+
+// Implement the SendMessage RPC
+function sendMessage(call) {
+    console.log("Client connected to chat service.");
+
+    // Pipe incoming messages from the client to outgoing messages
+    call.on('data', (message) => {
+        console.log(`${message.name}: ${message.message}`);
+
+        // Send back the message to the client
+        call.write({ name: message.name, message: message.message });
+    });
+
+    call.on('end', () => {
+        console.log("Client disconnected.");
+        call.end();  // Close the stream
+    });
+
+    call.on('error', (e) => {
+        console.error("Error: ", e);
+        call.end(); // Close the stream in case of error
+    });
 }
 
-const server = new grpc.Server();
-server.addService(chatProto.ChatService.service, {
-    SendMessage : sendMessage
+// Add service to the server
+server.addService(chatProto.ChatService.service, { SendMessage: sendMessage });
+
+// Start the server
+server.bindAsync('127.0.0.1:50060', grpc.ServerCredentials.createInsecure(), () => {
+    console.log('Chat Server running at http://127.0.0.1:50060');
 });
-server.bindAsync('127.0.0.1:50053', grpc.ServerCredentials.createInsecure(), () => {
-    console.log('ChatService is running');
-    server.start();
-})

@@ -205,13 +205,8 @@ app.get('/chat', (req, res) => {
             return;
         }
 
-        chat.sendMessage(req, (err, chatData) => {
-            if (err) {
-                res.status(500).send("Error sending chat message");
-                return;
-            }
-            res.status(200).send(chatData);
-        });
+        console.log(req.query.id, req.query.message);
+        chat.sendMessage(req.query.id, req.query.message);
     });
 });
 

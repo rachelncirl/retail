@@ -1,50 +1,37 @@
-var readline = require('readline');
-var readlineSync = require('readline-sync')
-var grpc = require("@grpc/grpc-js");
-var protoLoader = require("@grpc/proto-loader");
-var PROTO_PATH = __dirname + "/protos/chat.proto"
+var grpc = require("@grpc/grpc-js")
+var protoLoader = require("@grpc/proto-loader")
 
-var packageDefinition = protoLoader.loadSync(PROTO_PATH)
-var chat_proto = grpc.loadPackageDefinition(packageDefinition).chat
+// Load the proto files
+const chat = protoLoader.loadSync('../protos/chat.proto', {});
+const chatProto = grpc.loadPackageDefinition(chat).chat;
 
-var client = new chat_proto.ChatService("0.0.0.0:40001", grpc.credentials.createInsecure());
+// Create a client and connect to the server
+const client = new chatProto.ChatService('127.0.0.1:50060', grpc.credentials.createInsecure());
 
-var name = readlineSync.question("What is your name? ")
-var call = client.sendMessage();
+// Create a stream to send and receive messages
+const call = client.SendMessage();
 
-call.on('data', function(resp){
-    console.log(resp.name +": " + resp.message)
-});
-call.on('end',function(){
-
-});
-call.on("error", function(e){
-    console.log("Cannot connect to chat server")
-})
-
-call.write({
-    message: name + " joined the chatroom",
-    name: name
+// Listen for incoming messages from the server
+call.on('data', (message) => {
+    console.log(`Server: ${message.name} says: ${message.message}`);
 });
 
-var rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
+// Handle errors
+call.on('error', (e) => {
+    console.error("Error: ", e);
 });
 
-rl.on("line", function(message){
-    if(message.toLowerCase() === "quit"){
-        call.write({
-            message: name + " left the chatroom",
-            name: name
-        });
-        call.end();
-        rl.close();
-    }else {
-        call.write({
-            message: message,
-            name: name
-        });
-    }
-});
+// Function to send a message to the server
+function sendMessage(name, message) {
+    call.write({ name, message });
+}
 
+// Send some initial messages
+sendMessage('Client1', 'Hello, Server!');
+setTimeout(() => sendMessage('Client1', 'How are you?'), 2000);
+setTimeout(() => sendMessage('Client1', 'Goodbye!'), 4000);
+
+// Close the stream after sending messages
+setTimeout(() => {
+    call.end();
+}, 5000);

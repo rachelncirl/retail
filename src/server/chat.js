@@ -9,11 +9,13 @@ var clients = {
 }
 
 function SendMessage(call){
-  call.on('data', function(chat_message){
+  call.on('data', function(chatMessage){
 
-    if(!(chat_message.name in clients)){
-      clients[chat_message.name] = {
-        name: chat_message.name,
+    console.log(chatMessage);
+
+    if(!(chatMessage.name in clients)){
+      clients[chatMessage.name] = {
+        name: chatMessage.name,
         call: call
       }
     }
@@ -21,12 +23,13 @@ function SendMessage(call){
     for(var client in clients){
       clients[client].call.write(
         {
-          name: chat_message.name,
-          message: chat_message.message
+          name: chatMessage.name,
+          message: chatMessage.message
         }
       )
     }
   });
+  
   call.on('end', function(){
     call.end();
   });

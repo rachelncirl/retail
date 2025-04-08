@@ -5,17 +5,25 @@ const protoLoader = require('@grpc/proto-loader');
 const chat = protoLoader.loadSync('../protos/chat.proto', {});
 const chatProto = grpc.loadPackageDefinition(chat).chat;
 
-const chatClient = new chatProto.ChatService('localhost:50055', grpc.credentials.createInsecure());
+// Create a client and connect to the server
+const client = new chatProto.ChatService('127.0.0.1:50060', grpc.credentials.createInsecure());
 
-function sendMessage(req, callback) {
-    console.log(req);
-    chatClient.SendMessage({message: message}, (err, response) => {
-        if (err) {
-            console.log("Error sending chat message", err);
-        } else {
-            callback(null, response);
-        }
-    });
+// Create a stream to send and receive messages
+const call = client.SendMessage();
+
+// Listen for incoming messages from the server
+call.on('data', (message) => {
+    console.log(`Server: ${message.name} says: ${message.message}`);
+});
+
+// Handle errors
+call.on('error', (e) => {
+    console.error("Error: ", e);
+});
+
+// Function to send a message to the server
+function sendMessage(name, message) {
+    call.write({ name, message });
 }
 
 module.exports = { sendMessage };
