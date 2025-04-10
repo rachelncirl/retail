@@ -3,7 +3,7 @@ const product = require('./productClient');
 const cart = require('./cartClient');
 const discount = require('./discountClient');
 const purchase = require('./purchaseClient');
-const chat = require('./chatClient');
+//const chat = require('./chatClient');
 const discovery = require('./discoveryClient');
 const app = express();
 const port = 3000;
@@ -196,19 +196,7 @@ app.post('/order', (req, res) => {
 
 // Chat
 
-app.get('/chat', (req, res) => {
 
-    // Discover discount service and then fetch the discount
-    discovery.discoverService('chatService', (chatService) => {
-        if (!chatService) {
-            res.status(500).send("Chat Service not found");
-            return;
-        }
-
-        console.log(req.query.id, req.query.message);
-        chat.sendMessage(req.query.id, req.query.message);
-    });
-});
 
 app.listen(port, () => {
     console.log(`Client is running on port ${port}`);

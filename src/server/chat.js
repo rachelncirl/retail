@@ -8,7 +8,7 @@ const chatProto = grpc.loadPackageDefinition(chat).chat;
 var clients = {
 }
 
-function SendMessage(call){
+function Chat(call){
   call.on('data', function(chatMessage){
 
     console.log(chatMessage);
@@ -29,7 +29,7 @@ function SendMessage(call){
       )
     }
   });
-  
+
   call.on('end', function(){
     call.end();
   });
@@ -42,7 +42,7 @@ function SendMessage(call){
 // Create gRPC server and add services
 const server = new grpc.Server();
 server.addService(chatProto.ChatService.service, {
-  SendMessage
+  Chat
 });
 
 const PORT = '50055';

@@ -9,7 +9,7 @@ const chatProto = grpc.loadPackageDefinition(chat).chat;
 const server = new grpc.Server();
 
 // Implement the SendMessage RPC
-function sendMessage(call) {
+function Chat(call) {
     console.log("Client connected to chat service.");
 
     // Pipe incoming messages from the client to outgoing messages
@@ -32,7 +32,7 @@ function sendMessage(call) {
 }
 
 // Add service to the server
-server.addService(chatProto.ChatService.service, { SendMessage: sendMessage });
+server.addService(chatProto.ChatService.service, { Chat });
 
 // Start the server
 server.bindAsync('127.0.0.1:50060', grpc.ServerCredentials.createInsecure(), () => {
