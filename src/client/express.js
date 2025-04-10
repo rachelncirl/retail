@@ -1,16 +1,27 @@
 const express = require('express');
+const socketIo = require('socket.io');
+const http = require('http');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
 const product = require('./productClient');
 const cart = require('./cartClient');
 const discount = require('./discountClient');
 const purchase = require('./purchaseClient');
-//const chat = require('./chatClient');
+const chat = require('./chatClient');
 const discovery = require('./discoveryClient');
-const app = express();
+
 const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+// Start Chat Socket
+chat(io);
+
 
 // Product
 
@@ -34,6 +45,25 @@ app.get('/list', (req, res) => {
                 return;
             }
             res.status(200).send(product);
+        });
+    });
+});
+
+app.get('/price', (req, res) => {
+
+    // Discover product service and then the price of the product
+    discovery.discoverService('productService', (productService) => {
+        if (!productService) {
+            res.status(500).send("Product Service not found");
+            return;
+        }
+
+        product.getPrice(req, (err, priceData) => {
+            if (err) {
+                res.status(500).send("Error getting the price");
+                return;
+            }
+            res.status(200).send(priceData);
         });
     });
 });
@@ -194,10 +224,6 @@ app.post('/order', (req, res) => {
     });
 });
 
-// Chat
-
-
-
-app.listen(port, () => {
-    console.log(`Client is running on port ${port}`);
+server.listen(port, () => {
+    console.log(`Web Server is running on port ${port}`);
 });

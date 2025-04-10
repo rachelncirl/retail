@@ -1,62 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8"
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title> Chat </title>
-        <style>
-            body {
-                font-family: Arial, Helvetica, sans-serif;
-                margin: 0;
-                padding: 0px;
-                background-color: white;
-            }
-            #chat-container {
-                width: 400px;
-                margin: 0 auto;
-                padding: 10px;
-                background-color: white;
-                border-radius: 5px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-            #messages {
-                height: 300px;
-                overflow-y: scroll;
-                border-bottom: 1px solid;
-                padding: 10px;
-                margin-bottom: 10px;
-            }
-            #message-input {
-                width: calc(100% - 20px);
-                padding: 10px;
-                font-size: 16px;
-                margin-top: 10px;
-            }
-            #send-button {
-                padding: 10px, 15px;
-                color: white;
-                border: none;
-                cursor: pointer;
-                background-color: green;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="chat-container">
-            <div id="messages"></div>
-            <input type="text" id="messageInput" placeholder="Type your message..."/>
-            <button id="sendMessage">Send</button>
-        </div>
 
-        <script src="/js/chat.js"></script>
-        
-    </body>
-    <script>
-        function generateChatId() {
-            return Math.random().toString(36).substr(2, 6);  // Random 9-character alphanumeric string
+<head>
+    <meta charset="UTF-8" <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Chat </title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0px;
+            background-color: white;
         }
 
-        window.chatId = generateChatId();
+        #chat-container {
+            width: 400px;
+            margin: 0 auto;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #messages {
+            height: 300px;
+            overflow-y: scroll;
+            border-bottom: 1px solid;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        #message-input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        #send-button {
+            padding: 10px, 15px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            background-color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <input type="text" id="messages-input" placeholder="Type your message..." />
+        <button id="send-button">Send</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var username = '';
+
+        var messages = document.getElementById('messages');
+        var input = document.getElementById('messages-input');
+        var sendButton = document.getElementById('send-button');
+
+        socket.on('chat message', function (data) {
+            console.log(data);
+            var messageElement = document.createElement('div');
+            messageElement.textContent = data.name + ': ' + data.message;
+            messages.appendChild(messageElement);
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        sendButton.addEventListener('click', function () {
+            var message = input.value;
+            if (message.trim()) {
+                var data = { user: window.chatId, message }
+                console.log("User: " + data.user + ", Message: " + data.message);
+
+                // This sends the message to the express server
+                socket.emit('chat message', data);
+                input.value = '';
+            }
+        });
+    </script>
+    <script>
+        function generateUsername() {
+            const adjectives = ["Cool", "Happy", "Trendy", "Smart", "Hip", "Savvy"];
+            const animals = ["Cat", "Panda", "Eagle", "Shark", "Wolf", "Fox"];
+            const number = Math.floor(Math.random() * 100);
+
+            const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const animal = animals[Math.floor(Math.random() * animals.length)];
+
+            return `${adjective}${animal}${number}`;
+        }
+
+        window.chatId = generateUsername();
         console.log("Generated Chat ID:", chatId);
     </script>
+</body>
+
 </html>

@@ -34,7 +34,19 @@ function getProducts(callback) {
             console.error(error);
             callback(null, 'Error occurred while fetching shoes');
         });
-
 }
 
-module.exports = { getProducts };
+function getPrice(req, callback) {
+    const brand = req.query.brand;
+
+    productClient.GetPrice({ brand }, (error, priceData) => {
+        if (error) {
+            console.error('Error:', error);
+            callback(error, 'Error occurred while applying the Discount');
+        } else {
+            callback(null, priceData);
+        }
+    });
+}
+
+module.exports = { getProducts, getPrice };

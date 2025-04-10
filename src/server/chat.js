@@ -5,8 +5,7 @@ var protoLoader = require("@grpc/proto-loader")
 const chat = protoLoader.loadSync('../protos/chat.proto', {});
 const chatProto = grpc.loadPackageDefinition(chat).chat;
 
-var clients = {
-}
+var clients = {}
 
 function Chat(call){
   call.on('data', function(chatMessage){
