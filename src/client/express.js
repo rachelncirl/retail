@@ -34,24 +34,24 @@ app.get('/list', (req, res) => {
             return;
         }
 
-        product.getProducts((err, product) => {
+        product.getProducts((err, productList) => {
             if (err) {
                 res.status(500).send("Error fetching product");
                 return;
             }
 
-            if (!product) {
+            if (!productList) {
                 res.send("Product not found");
                 return;
             }
-            res.status(200).send(product);
+            res.status(200).send(productList);
         });
     });
 });
 
 app.get('/price', (req, res) => {
 
-    // Discover product service and then the price of the product
+    // Discover product service and then get the price of the product
     discovery.discoverService('productService', (productService) => {
         if (!productService) {
             res.status(500).send("Product Service not found");
